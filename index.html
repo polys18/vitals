@@ -3,815 +3,927 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demetra — Family Health, Together</title>
+  <title>Demetra | Like Having a Doctor in the Family</title>
+  <meta name="description" content="Demetra unifies your health data and uses AI to guide proactive care for you and your family. Free. Join the waitlist.">
+  <meta property="og:title" content="Demetra | Like Having a Doctor in the Family">
+  <meta property="og:description" content="The proactive health platform for families. Know what to do next. Join the waitlist.">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Demetra | Like Having a Doctor in the Family">
+  <meta name="twitter:description" content="The proactive health platform for families.">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","name":"Demetra","url":"https://demetrahealth.com","description":"The proactive health platform for families"}</script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
-    /* ── Reset & Base ─────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     :root {
-      --color-primary:    #0891B2;
-      --color-secondary:  #22D3EE;
-      --color-accent:     #059669;
-      --color-background: #ECFEFF;
-      --color-foreground: #164E63;
-      --color-muted:      #E8F1F6;
-      --color-border:     #A5F3FC;
-      --color-surface:    #FFFFFF;
-      --color-text-body:  #1E4D5F;
-      --color-text-dim:   #4A7A8A;
-
-      --font-heading: 'Figtree', sans-serif;
-      --font-body: 'Noto Sans', sans-serif;
-
-      --radius-sm: 8px;
-      --radius-md: 12px;
-      --radius-lg: 20px;
-      --radius-pill: 100px;
-
-      --shadow-card: 0 4px 24px rgba(8,145,178,0.10), 0 1px 4px rgba(8,145,178,0.06);
-      --shadow-btn:  0 4px 16px rgba(5,150,105,0.30);
-
-      --transition: 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      --grad: linear-gradient(135deg, #7E6FAE, #4EA8A6);
+      --teal: #4EA8A6;  --teal-s: #E6F5F4;
+      --lav: #7E6FAE;   --lav-s: #EEEAF5;
+      --bg: #F6F4F0;    --surf: #FFFFFF;
+      --bord: #E8E4DD;  --text: #1A1A2E;  --t2: #6B7280;
+      --ease: cubic-bezier(0.16,1,0.3,1);
+      --spring: cubic-bezier(0.34,1.56,0.64,1);
+      --bounce: cubic-bezier(0.22,1.8,0.36,1);
     }
-
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
-    }
-
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
 
-    body {
-      background: var(--color-background);
-      color: var(--color-foreground);
-      font-family: var(--font-body);
-      font-size: 16px;
-      line-height: 1.6;
-      min-height: 100dvh;
+    .skip { position:absolute; top:-100px; left:16px; z-index:9999; background:var(--surf); color:var(--text); padding:8px 16px; border-radius:8px; font-size:14px; text-decoration:none; }
+    .skip:focus { top:16px; }
+
+    /* ══ REVEAL SYSTEM ══ */
+    .r       { opacity:0; transform:translateY(48px);    transition:opacity .7s var(--ease) var(--d,0s), transform .7s var(--ease) var(--d,0s); will-change:opacity,transform; }
+    .r-left  { opacity:0; transform:translateX(-56px);   transition:opacity .7s var(--ease) var(--d,0s), transform .7s var(--ease) var(--d,0s); will-change:opacity,transform; }
+    .r-right { opacity:0; transform:translateX(56px);    transition:opacity .7s var(--ease) var(--d,0s), transform .7s var(--ease) var(--d,0s); will-change:opacity,transform; }
+    .r-scale { opacity:0; transform:scale(.75) translateY(20px); transition:opacity .65s var(--spring) var(--d,0s), transform .65s var(--spring) var(--d,0s); will-change:opacity,transform; }
+    .r-clip  { clip-path:inset(0 0 100% 0); transition:clip-path .75s var(--ease) var(--d,0s); will-change:clip-path; }
+    .r,.r-left,.r-right,.r-scale { }
+    .r.on,.r-left.on,.r-right.on { opacity:1; transform:none; }
+    .r-scale.on { opacity:1; transform:none; }
+    .r-clip.on  { clip-path:inset(0 0 0% 0); }
+    @media (prefers-reduced-motion:reduce) { .r,.r-left,.r-right,.r-scale { opacity:1; transform:none; transition:none; } .r-clip { clip-path:none; transition:none; } }
+
+    /* ══ NAV ══ */
+    .nav { position:fixed; top:16px; left:50%; transform:translateX(-50%); z-index:100; width:min(92vw,560px); padding:10px 10px 10px 20px; border-radius:999px; display:flex; align-items:center; justify-content:space-between; background:linear-gradient(135deg,rgba(255,255,255,.3) 0%,rgba(255,255,255,.15) 40%,rgba(246,244,240,.18) 100%); backdrop-filter:blur(32px) saturate(1.7) brightness(1.06); -webkit-backdrop-filter:blur(32px) saturate(1.7) brightness(1.06); border:1px solid rgba(255,255,255,.35); box-shadow:0 2px 16px rgba(26,26,46,.05), inset 0 1px 0 rgba(255,255,255,.4), inset 0 -1px 0 rgba(255,255,255,.08); animation:nav-drop .8s var(--ease) .1s both; }
+    @keyframes nav-drop { from{opacity:0;transform:translateX(-50%) translateY(-20px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+    .nav-logo { font-family:'Outfit',sans-serif; font-weight:700; font-size:19px; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:7px; }
+    .d-icon { width:26px; height:26px; border-radius:7px; background:var(--grad); display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; font-weight:700; flex-shrink:0; }
+
+    /* ══ BUTTONS ══ */
+    .btn { border:none; cursor:pointer; font-family:'Inter',sans-serif; font-weight:600; display:inline-flex; align-items:center; justify-content:center; touch-action:manipulation; position:relative; overflow:hidden; }
+    .btn::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.22) 50%,transparent 100%); transform:translateX(-100%); transition:transform .6s var(--ease); pointer-events:none; }
+    .btn:hover::after { transform:translateX(100%); }
+    .btn-grad { background:var(--grad); color:#fff; border-radius:14px; padding:13px 30px; font-size:16px; box-shadow:0 4px 18px rgba(126,111,174,.3); transition:transform .3s var(--spring),box-shadow .3s var(--ease); animation:cta-pulse 3s ease-in-out infinite; }
+    .btn-grad:hover,.btn-grad:focus-visible { transform:translateY(-3px) scale(1.04); box-shadow:0 10px 32px rgba(126,111,174,.45); animation:none; }
+    @keyframes cta-pulse { 0%,100%{box-shadow:0 4px 18px rgba(126,111,174,.3)} 50%{box-shadow:0 4px 28px rgba(126,111,174,.55)} }
+    .btn-pill { border-radius:999px; padding:8px 20px; font-size:13px; }
+    .btn-pill:hover,.btn-pill:focus-visible { transform:scale(1.06); }
+    .btn-lg { padding:14px 36px; font-size:17px; border-radius:14px; }
+    .btn-white { background:var(--surf); color:var(--text); box-shadow:0 2px 12px rgba(26,26,46,.1); border-radius:14px; padding:14px 36px; font-size:17px; transition:transform .3s var(--spring),box-shadow .3s var(--ease); }
+    .btn-white::after { background:linear-gradient(90deg,transparent,rgba(0,0,0,.04),transparent); }
+    .btn-white:hover,.btn-white:focus-visible { transform:translateY(-3px) scale(1.04); box-shadow:0 10px 28px rgba(26,26,46,.15); }
+
+    /* ══ CONTAINERS ══ */
+    .wrap { width:100%; max-width:1200px; padding:0 clamp(20px,5vw,32px); margin:0 auto; }
+    .wrap-narrow { max-width:680px; }
+
+    /* ══ SECTIONS ══ */
+    .sec { display:flex; align-items:center; justify-content:center; padding:clamp(64px,10vw,100px) 0; }
+    .sec>.wrap { display:flex; flex-direction:column; align-items:center; }
+    .sec-bg { background:var(--bg); }
+    .sec-white { background:var(--surf); }
+
+    /* ══ HERO ══ */
+    .hero { min-height:100svh; padding:0; background:var(--bg); position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+    .hero-inner { display:flex; flex-direction:column; align-items:center; text-align:center; padding:clamp(90px,16vw,120px) clamp(20px,5vw,32px) clamp(60px,10vw,80px); position:relative; z-index:1; max-width:820px; margin:0 auto; }
+
+    /* blobs — larger, faster, more dramatic */
+    .blob { position:absolute; border-radius:50%; pointer-events:none; will-change:transform; }
+    .blob-1 { width:clamp(400px,65vw,800px); height:clamp(400px,65vw,800px); background:radial-gradient(circle at 40% 40%,rgba(126,111,174,.22),transparent 60%); top:-20%; right:-10%; animation:blob1 10s ease-in-out infinite; }
+    .blob-2 { width:clamp(300px,50vw,600px); height:clamp(300px,50vw,600px); background:radial-gradient(circle at 60% 60%,rgba(78,168,166,.2),transparent 60%); bottom:-10%; left:-8%; animation:blob2 13s ease-in-out infinite; }
+    .blob-3 { width:clamp(200px,30vw,360px); height:clamp(200px,30vw,360px); background:radial-gradient(circle at 50% 50%,rgba(126,111,174,.14),transparent 60%); top:35%; left:8%; animation:blob3 17s ease-in-out infinite; }
+    @keyframes blob1 { 0%,100%{transform:translate(0,0) scale(1)} 30%{transform:translate(-40px,50px) scale(1.12)} 70%{transform:translate(30px,-35px) scale(.93)} }
+    @keyframes blob2 { 0%,100%{transform:translate(0,0) scale(1)} 50%{transform:translate(55px,-45px) scale(1.18)} }
+    @keyframes blob3 { 0%,100%{transform:translate(0,0) scale(1)} 35%{transform:translate(-25px,35px) scale(1.1)} 70%{transform:translate(30px,-20px) scale(.9)} }
+
+    /* hero particles */
+    .particles { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+    .dot { position:absolute; border-radius:50%; opacity:0; animation:dot-float var(--dur,8s) ease-in-out var(--dly,0s) infinite; }
+    @keyframes dot-float {
+      0%   { opacity:0; transform:translate(0,0) scale(.6); }
+      15%  { opacity:.55; }
+      85%  { opacity:.45; }
+      100% { opacity:0; transform:translate(var(--tx,20px),var(--ty,-60px)) scale(1); }
     }
 
-    /* ── Skip Link ────────────────────────────────────── */
-    .skip-link {
-      position: absolute;
-      top: -100%;
-      left: 16px;
-      z-index: 1000;
-      background: var(--color-primary);
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: var(--radius-sm);
-      font-family: var(--font-heading);
-      font-weight: 600;
-      text-decoration: none;
-    }
-    .skip-link:focus { top: 16px; }
-
-    /* ── Nav ──────────────────────────────────────────── */
-    nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(236, 254, 255, 0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .nav-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .nav-logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--color-primary);
-      text-decoration: none;
-    }
-
-    .nav-logo svg { flex-shrink: 0; }
-
-    .nav-cta {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--color-primary);
-      color: #fff;
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 14px;
-      padding: 10px 20px;
-      border-radius: var(--radius-pill);
-      text-decoration: none;
-      transition: background var(--transition), transform var(--transition);
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .nav-cta:hover { background: #0771A0; transform: translateY(-1px); }
-    .nav-cta:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; }
-    .nav-cta:active { transform: translateY(0); }
-
-    /* ── Hero ─────────────────────────────────────────── */
-    .hero {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 80px 24px 64px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      align-items: center;
-      gap: 64px;
-    }
-
-    @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr; gap: 40px; padding: 48px 24px; }
-      .hero-visual { order: -1; }
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(8,145,178,0.10);
-      color: var(--color-primary);
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 13px;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      padding: 6px 14px;
-      border-radius: var(--radius-pill);
-      margin-bottom: 24px;
-    }
-
-    .hero-badge-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--color-accent);
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.5; transform: scale(0.8); }
-    }
-
-    h1 {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: clamp(32px, 5vw, 52px);
-      line-height: 1.15;
-      color: var(--color-foreground);
-      margin-bottom: 20px;
-    }
-
-    h1 em {
-      font-style: normal;
-      color: var(--color-primary);
-    }
-
-    .hero-desc {
-      font-size: 18px;
-      line-height: 1.7;
-      color: var(--color-text-body);
-      margin-bottom: 36px;
-      max-width: 480px;
-    }
-
-    .hero-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--color-accent);
-      color: #fff;
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 16px;
-      padding: 14px 28px;
-      border-radius: var(--radius-pill);
-      text-decoration: none;
-      box-shadow: var(--shadow-btn);
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      cursor: pointer;
-      min-height: 48px;
-    }
-    .btn-primary:hover { background: #047857; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,0.35); }
-    .btn-primary:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
-    .btn-primary:active { transform: translateY(0); }
-
-    .btn-ghost {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--color-primary);
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 15px;
-      text-decoration: none;
-      padding: 14px 4px;
-      border-bottom: 2px solid transparent;
-      transition: border-color var(--transition), color var(--transition);
-      min-height: 48px;
-    }
-    .btn-ghost:hover { border-color: var(--color-primary); }
-    .btn-ghost:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 3px; border-radius: 4px; }
-
-    /* ── Hero Visual ──────────────────────────────────── */
-    .hero-visual {
-      position: relative;
-    }
-
-    .monitor-card {
-      background: #0A1628;
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      box-shadow: 0 24px 64px rgba(8,145,178,0.20), 0 4px 16px rgba(0,0,0,0.15);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .monitor-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(8,145,178,0.08) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .monitor-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .monitor-title {
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: #ff6600;
-    }
-
-    .monitor-dots {
-      display: flex;
-      gap: 6px;
-    }
-
-    .monitor-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-
-    .monitor-dot:nth-child(1) { background: #FF5F57; }
-    .monitor-dot:nth-child(2) { background: #FFBD2E; }
-    .monitor-dot:nth-child(3) { background: #28CA41; }
-
-    .vital-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .vital-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .vital-label {
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      color: #888;
-      width: 80px;
-      flex-shrink: 0;
-      letter-spacing: 0.05em;
-    }
-
-    .vital-bar-track {
-      flex: 1;
-      height: 6px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .vital-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      animation: grow 1.5s ease-out forwards;
-    }
-
-    @keyframes grow {
-      from { width: 0; }
-    }
-
-    .vital-value {
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-      font-weight: 700;
-      width: 48px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    .vital-row:nth-child(1) .vital-bar-fill { background: #4a9eff; width: 72%; }
-    .vital-row:nth-child(1) .vital-value { color: #4a9eff; }
-    .vital-row:nth-child(2) .vital-bar-fill { background: #ff4a4a; width: 58%; }
-    .vital-row:nth-child(2) .vital-value { color: #ff4a4a; }
-    .vital-row:nth-child(3) .vital-bar-fill { background: #e8e8e8; width: 95%; }
-    .vital-row:nth-child(3) .vital-value { color: #e8e8e8; }
-    .vital-row:nth-child(4) .vital-bar-fill { background: #ffd700; width: 45%; }
-    .vital-row:nth-child(4) .vital-value { color: #ffd700; }
-
-    .monitor-footer {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255,255,255,0.06);
-    }
-
-    .live-indicator {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      color: #28CA41;
-      letter-spacing: 0.08em;
-    }
-
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      background: #28CA41;
-      border-radius: 50%;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-
-    /* ── Stats ────────────────────────────────────────── */
-    .stats-section {
-      background: var(--color-surface);
-      border-top: 1px solid var(--color-border);
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .stats-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 48px 24px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 32px;
-    }
-
-    @media (max-width: 768px) {
-      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; }
-    }
-
-    @media (max-width: 480px) {
-      .stats-inner { grid-template-columns: 1fr; }
-    }
-
-    .stat-item {
-      text-align: center;
-    }
-
-    .stat-number {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 36px;
-      color: var(--color-primary);
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .stat-label {
-      font-size: 14px;
-      color: var(--color-text-dim);
-      line-height: 1.4;
-    }
-
-    /* ── Features ─────────────────────────────────────── */
-    .features-section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 80px 24px;
-    }
-
-    .section-label {
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 13px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--color-primary);
-      margin-bottom: 12px;
-    }
-
-    h2 {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: clamp(24px, 4vw, 38px);
-      color: var(--color-foreground);
-      line-height: 1.25;
-      margin-bottom: 16px;
-    }
-
-    .section-desc {
-      font-size: 17px;
-      color: var(--color-text-body);
-      line-height: 1.7;
-      max-width: 560px;
-      margin-bottom: 56px;
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-    }
-
-    @media (max-width: 900px) {
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-
-    @media (max-width: 560px) {
-      .features-grid { grid-template-columns: 1fr; }
-    }
-
-    .feature-card {
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-md);
-      padding: 28px 24px;
-      box-shadow: var(--shadow-card);
-      transition: transform var(--transition), box-shadow var(--transition);
-    }
-
-    .feature-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 32px rgba(8,145,178,0.14), 0 2px 8px rgba(8,145,178,0.08);
-    }
-
-    .feature-icon {
-      width: 48px;
-      height: 48px;
-      background: rgba(8,145,178,0.10);
-      border-radius: var(--radius-sm);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-      color: var(--color-primary);
-    }
-
-    .feature-title {
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 16px;
-      color: var(--color-foreground);
-      margin-bottom: 8px;
-    }
-
-    .feature-desc {
-      font-size: 14px;
-      color: var(--color-text-dim);
-      line-height: 1.65;
-    }
-
-    /* ── CTA Section ──────────────────────────────────── */
-    .cta-section {
-      background: linear-gradient(135deg, #0A1628 0%, #0C2340 50%, #093045 100%);
-      padding: 80px 24px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .cta-section::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(8,145,178,0.15) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .cta-inner {
-      position: relative;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-
-    .cta-section h2 {
-      color: #fff;
-      margin-bottom: 16px;
-    }
-
-    .cta-section p {
-      color: rgba(255,255,255,0.70);
-      font-size: 17px;
-      line-height: 1.7;
-      margin-bottom: 40px;
-    }
-
-    .btn-launch {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--color-accent);
-      color: #fff;
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 18px;
-      padding: 18px 40px;
-      border-radius: var(--radius-pill);
-      text-decoration: none;
-      box-shadow: 0 4px 32px rgba(5,150,105,0.45);
-      transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
-      cursor: pointer;
-      min-height: 56px;
-    }
-    .btn-launch:hover { background: #047857; transform: translateY(-3px); box-shadow: 0 10px 40px rgba(5,150,105,0.50); }
-    .btn-launch:focus-visible { outline: 3px solid #22D3EE; outline-offset: 4px; }
-    .btn-launch:active { transform: translateY(0); }
-
-    /* ── Footer ───────────────────────────────────────── */
-    footer {
-      background: var(--color-surface);
-      border-top: 1px solid var(--color-border);
-      padding: 32px 24px;
-    }
-
-    .footer-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .footer-logo {
-      font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 15px;
-      color: var(--color-primary);
-    }
-
-    .footer-note {
-      font-size: 13px;
-      color: var(--color-text-dim);
-    }
+    /* hero badge */
+    .hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(78,168,166,.12); border:1px solid rgba(78,168,166,.3); border-radius:999px; padding:6px 14px 6px 8px; font-size:13px; color:var(--teal); font-weight:500; margin-bottom:22px; animation:badge-enter .9s var(--spring) .3s both, badge-float 3.5s ease-in-out 1.2s infinite; }
+    @keyframes badge-enter { from{opacity:0;transform:translateY(-16px) scale(.85)} to{opacity:1;transform:none} }
+    @keyframes badge-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+    .badge-dot { width:8px; height:8px; border-radius:50%; background:var(--teal); animation:pulse-dot 2s ease-in-out infinite; }
+    @keyframes pulse-dot { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:.6} }
+
+    /* hero headline */
+    .hero-h1 { font-family:'Outfit',sans-serif; font-size:clamp(38px,7vw,62px); font-weight:700; color:var(--text); line-height:1.06; margin:0; animation:hero-h1-enter 1s var(--ease) .4s both; }
+    .hero-h1 .grad-text { background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; background-size:200% 200%; animation:grad-pan 4s ease-in-out infinite; }
+    @keyframes hero-h1-enter { from{opacity:0;transform:translateY(36px)} to{opacity:1;transform:none} }
+    @keyframes grad-pan { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+    .hero-sub { font-size:clamp(16px,2vw,19px); color:var(--t2); line-height:1.7; margin-top:20px; max-width:540px; animation:hero-sub-enter 1s var(--ease) .55s both; }
+    @keyframes hero-sub-enter { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
+    .hero-btn-wrap { animation:hero-btn-enter 1s var(--spring) .7s both; }
+    @keyframes hero-btn-enter { from{opacity:0;transform:translateY(20px) scale(.9)} to{opacity:1;transform:none} }
+    .scroll-ind { position:absolute; bottom:28px; left:50%; transform:translateX(-50%); color:var(--t2); font-size:24px; opacity:.25; animation:bob 2.8s ease-in-out infinite, scroll-fade 1s var(--ease) 1.2s both; }
+    @keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0);opacity:.25} 50%{transform:translateX(-50%) translateY(9px);opacity:.45} }
+    @keyframes scroll-fade { from{opacity:0} to{} }
+
+    /* ══ STORY CARD ══ */
+    .story-card { max-width:640px; width:100%; background:var(--surf); border-radius:20px; padding:clamp(28px,5vw,44px); border:1px solid var(--bord); box-shadow:0 4px 24px rgba(26,26,46,.06); position:relative; cursor:pointer; transition:transform .4s var(--spring),box-shadow .4s var(--ease),border-color .3s; text-align:left; }
+    .story-card:hover { transform:translateY(-7px) scale(1.01); box-shadow:0 20px 60px rgba(126,111,174,.16); border-color:rgba(126,111,174,.3); }
+    .story-card:hover .story-q { opacity:.45; transform:translateY(-4px); }
+    .story-q { font-size:60px; line-height:1; color:var(--lav); opacity:.22; font-family:Georgia,serif; position:absolute; top:10px; left:22px; pointer-events:none; transition:opacity .3s,transform .3s var(--ease); }
+    .story-text { font-size:clamp(15px,1.8vw,17px); color:var(--t2); line-height:1.8; padding-top:22px; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+    .story-attr { display:flex; align-items:center; justify-content:space-between; margin-top:20px; flex-wrap:wrap; gap:12px; }
+    .story-by { font-size:13px; font-weight:500; color:var(--text); display:flex; align-items:center; gap:8px; }
+    .story-avatar { width:32px; height:32px; border-radius:50%; background:var(--grad); display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Outfit',sans-serif; font-size:13px; font-weight:700; flex-shrink:0; }
+    .story-link { font-size:14px; font-weight:600; color:var(--teal); display:flex; align-items:center; gap:5px; transition:gap .2s var(--ease); }
+    .story-card:hover .story-link { gap:9px; }
+    .story-link svg { flex-shrink:0; }
+
+    /* ══ STATS ══ */
+    .stats { display:flex; gap:16px; flex-wrap:wrap; justify-content:center; width:100%; }
+    .stat { flex:1 1 180px; max-width:280px; background:var(--surf); border-radius:16px; padding:28px 20px; box-shadow:0 2px 8px rgba(26,26,46,.05); text-align:center; border:1px solid var(--bord); transition:transform .4s var(--spring),box-shadow .4s var(--ease),border-color .3s; cursor:default; position:relative; overflow:hidden; }
+    .stat::before { content:''; position:absolute; inset:0; background:var(--grad); opacity:0; transition:opacity .35s; }
+    .stat:hover { transform:translateY(-7px) scale(1.03); box-shadow:0 16px 40px rgba(78,168,166,.18); border-color:var(--teal); }
+    .stat:hover::before { opacity:.03; }
+    .stat-n { font-family:'Outfit',sans-serif; font-size:clamp(36px,5vw,44px); font-weight:700; color:var(--teal); line-height:1; position:relative; }
+    .stat-d { font-size:14px; color:var(--text); margin-top:10px; line-height:1.5; position:relative; }
+
+    /* ══ HEADINGS ══ */
+    .h2 { font-family:'Outfit',sans-serif; font-size:clamp(26px,4.5vw,38px); font-weight:700; color:var(--text); line-height:1.15; margin:0 0 32px; text-align:center; }
+    .h2-italic { font-style:italic; font-size:clamp(28px,4.5vw,40px); }
+    .h2-sm { font-size:clamp(22px,3.5vw,30px); margin-bottom:20px; }
+    .body-lg { font-size:clamp(15px,1.8vw,18px); color:var(--t2); line-height:1.8; }
+    .body-md { font-size:15px; color:var(--t2); line-height:1.7; }
+    .grad-label { display:inline-block; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; background:var(--grad); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:12px; }
+
+    /* ══ BANNERS ══ */
+    .banner { width:100vw; margin-left:calc(-50vw + 50%); padding:36px 24px; text-align:center; background-size:200% 200%; }
+    .banner-lav { background:linear-gradient(135deg,var(--lav-s),#f0ecfa,var(--teal-s),var(--lav-s)); animation:banner-shift 8s ease-in-out infinite; }
+    .banner-teal { background:linear-gradient(135deg,var(--teal-s),#e8f5f5,var(--lav-s),var(--teal-s)); animation:banner-shift 10s ease-in-out infinite reverse; }
+    @keyframes banner-shift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+    .banner-title { font-family:'Outfit',sans-serif; font-size:clamp(16px,2.5vw,22px); font-weight:600; color:var(--text); max-width:680px; margin:0 auto; line-height:1.4; }
+    .banner-sub { font-size:14px; color:var(--t2); margin:6px auto 0; max-width:480px; }
+
+    /* ══ SPLIT FEATURE ══ */
+    .split { display:flex; flex-wrap:wrap; align-items:center; gap:clamp(28px,5vw,56px); max-width:1000px; width:100%; padding:0 clamp(16px,4vw,24px); justify-content:center; }
+    .split-rev { flex-direction:row-reverse; }
+    .split-text { flex:1 1 300px; max-width:440px; min-width:260px; }
+    .split-text h2 { font-family:'Outfit',sans-serif; font-size:clamp(24px,3.5vw,32px); font-weight:700; color:var(--text); line-height:1.18; margin:0; }
+    .split-text p { font-size:15px; color:var(--t2); line-height:1.7; margin-top:14px; }
+    .split-img { flex:0 1 240px; display:flex; justify-content:center; }
+
+    /* phone shot with continuous float */
+    .shot { width:100%; max-width:220px; aspect-ratio:9/16; background:linear-gradient(145deg,var(--lav-s),var(--teal-s)); border-radius:20px; border:2px solid var(--bord); display:flex; align-items:center; justify-content:center; padding:16px; text-align:center; flex-shrink:0; animation:phone-float 4s ease-in-out infinite; box-shadow:0 8px 24px rgba(78,168,166,.1); transition:box-shadow .4s var(--ease),border-color .3s; }
+    .shot:hover { box-shadow:0 20px 50px rgba(78,168,166,.2); border-color:rgba(78,168,166,.4); animation-play-state:paused; transform:scale(1.04) translateY(-6px); }
+    @keyframes phone-float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    .shot-lbl { color:var(--t2); font-size:11px; line-height:1.4; }
+
+    /* ══ AGENTS ══ */
+    .agent-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr)); gap:8px; max-width:680px; width:100%; margin:0 auto; }
+    .agent { background:var(--teal-s); border:1.5px solid rgba(78,168,166,.2); border-radius:12px; padding:12px 16px; display:flex; align-items:center; gap:10px; transition:transform .3s var(--spring),box-shadow .3s var(--ease),background .3s,border-color .3s; cursor:default; }
+    .agent:hover { transform:translateY(-4px) scale(1.02); box-shadow:0 8px 24px rgba(78,168,166,.18); background:#d0efee; border-color:var(--teal); }
+    .agent.soon { background:var(--bg); border:1.5px dashed var(--bord); opacity:.5; }
+    .agent.soon:hover { transform:none; box-shadow:none; background:var(--bg); border-color:var(--bord); }
+    .agent-ic { width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; background:rgba(78,168,166,.15); transition:background .3s,transform .3s var(--spring); }
+    .agent:hover .agent-ic { background:rgba(78,168,166,.25); transform:scale(1.1) rotate(-5deg); }
+    .agent.soon .agent-ic { background:rgba(107,114,128,.08); }
+    .agent-lbl { font-size:12.5px; color:var(--text); font-weight:500; line-height:1.35; }
+    .agent.soon .agent-lbl { font-weight:400; color:var(--t2); }
+    .soon-tag { font-style:italic; }
+
+    /* ══ VISION STRIP ══ */
+    .vision-strip { display:flex; overflow-x:auto; gap:14px; width:100%; padding:4px 2px 16px; scrollbar-width:none; }
+    .vision-strip::-webkit-scrollbar { display:none; }
+    .vision-pill { flex-shrink:0; background:var(--surf); border:1px solid var(--bord); border-radius:14px; padding:18px 20px; width:230px; box-shadow:0 1px 6px rgba(26,26,46,.04); transition:transform .3s var(--spring),box-shadow .3s var(--ease),border-color .3s,background .3s; cursor:default; }
+    .vision-pill:hover { transform:translateY(-5px) scale(1.02); box-shadow:0 12px 32px rgba(126,111,174,.14); border-color:rgba(126,111,174,.35); background:#faf9fd; }
+    .vision-pill h3 { font-family:'Outfit',sans-serif; font-size:13.5px; font-weight:600; color:var(--teal); margin:0 0 6px; }
+    .vision-pill p { font-size:12.5px; color:var(--t2); line-height:1.6; margin:0; }
+
+    /* ══ VALUES ACCORDION ══ */
+    .vals { display:flex; flex-direction:column; border:1px solid var(--bord); border-radius:16px; overflow:hidden; width:100%; max-width:680px; }
+    .val-item { border-bottom:1px solid var(--bord); }
+    .val-item:last-child { border-bottom:none; }
+    .val-trigger { width:100%; background:none; border:none; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-family:'Inter',sans-serif; text-align:left; gap:12px; transition:background .25s; }
+    .val-trigger:hover { background:var(--teal-s); }
+    .val-title { font-size:14px; font-weight:600; color:var(--text); }
+    .val-chevron { flex-shrink:0; width:18px; height:18px; color:var(--t2); transition:transform .4s var(--spring),color .2s; }
+    .val-item.open .val-chevron { transform:rotate(180deg); color:var(--teal); }
+    .val-item.open .val-trigger { background:var(--teal-s); }
+    .val-body { max-height:0; overflow:hidden; transition:max-height .45s var(--ease); }
+    .val-body-inner { padding:0 20px 16px; font-size:13.5px; color:var(--t2); line-height:1.7; }
+
+    /* ══ CREDIBILITY ══ */
+    .logo-strip { display:flex; gap:clamp(16px,3.5vw,32px); justify-content:center; align-items:center; margin-top:28px; flex-wrap:wrap; }
+    .logo-item { font-size:13px; font-weight:600; color:var(--t2); opacity:.4; letter-spacing:.5px; transition:opacity .3s; cursor:default; }
+    .logo-item:hover { opacity:.75; }
+
+    /* ══ CTA BAND ══ */
+    .cta-band { background:linear-gradient(135deg,#7E6FAE,#5ba8a6,#4EA8A6,#7E6FAE); background-size:300% 300%; padding:clamp(72px,10vw,120px) clamp(20px,5vw,32px); text-align:center; position:relative; overflow:hidden; animation:cta-grad 6s ease-in-out infinite; }
+    @keyframes cta-grad { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+    .cta-band::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 50%,rgba(255,255,255,.1),transparent 60%); pointer-events:none; animation:cta-glow 5s ease-in-out infinite alternate; }
+    @keyframes cta-glow { from{opacity:.5} to{opacity:1} }
+    .cta-band h2 { font-family:'Outfit',sans-serif; font-size:clamp(30px,5.5vw,48px); font-weight:700; color:#fff; line-height:1.1; margin:0; }
+    .cta-band p { font-size:17px; color:rgba(255,255,255,.82); margin:16px auto 0; max-width:400px; }
+
+    /* ══ FOOTER ══ */
+    footer { background:var(--text); padding:32px clamp(16px,4vw,32px) 20px; }
+    .foot-inner { max-width:1200px; margin:0 auto; display:flex; flex-wrap:wrap; gap:24px; justify-content:space-between; align-items:flex-start; }
+    .foot-brand { display:flex; align-items:center; gap:7px; text-decoration:none; }
+    .foot-name { font-family:'Outfit',sans-serif; font-weight:700; font-size:17px; color:#fff; }
+    .foot-tag { color:rgba(255,255,255,.35); font-size:12px; margin-top:3px; }
+    .socials { display:flex; gap:8px; align-items:center; }
+    .soc { width:32px; height:32px; border-radius:8px; background:rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,.5); font-size:12px; text-decoration:none; border:none; cursor:pointer; transition:background .2s,color .2s,transform .2s var(--spring); }
+    .soc:hover { background:rgba(255,255,255,.18); color:#fff; transform:translateY(-2px) scale(1.1); }
+    .foot-links a { display:block; color:rgba(255,255,255,.4); text-decoration:none; font-size:12px; margin-bottom:5px; transition:color .2s; }
+    .foot-links a:hover { color:rgba(255,255,255,.7); }
+    .foot-bottom { max-width:1200px; margin:16px auto 0; padding-top:16px; border-top:1px solid rgba(255,255,255,.06); text-align:center; }
+    .foot-copy { color:rgba(255,255,255,.22); font-size:11px; }
+    .foot-disc { color:rgba(255,255,255,.16); font-size:10px; margin:6px auto 0; max-width:460px; }
+
+    /* ══ STORY DRAWER ══ */
+    .drawer-overlay { position:fixed; inset:0; z-index:200; background:rgba(26,26,46,.4); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:flex; align-items:flex-end; justify-content:center; animation:fi .3s var(--ease); }
+    .drawer-overlay.hide { display:none; }
+    .drawer { background:var(--surf); border-radius:28px 28px 0 0; width:100%; max-width:720px; max-height:88vh; overflow-y:auto; position:relative; animation:drawer-up .45s var(--ease); }
+    .drawer-handle { width:40px; height:4px; background:var(--bord); border-radius:2px; margin:14px auto 0; }
+    .drawer-body { padding:clamp(20px,4vw,36px) clamp(24px,5vw,40px) clamp(32px,6vw,48px); }
+    .drawer-h { font-family:'Outfit',sans-serif; font-size:clamp(22px,4vw,30px); font-weight:700; color:var(--text); margin:0 0 24px; font-style:italic; }
+    .drawer-close { position:absolute; top:18px; right:18px; background:var(--bg); border:none; width:36px; height:36px; border-radius:50%; cursor:pointer; font-size:16px; color:var(--t2); display:flex; align-items:center; justify-content:center; transition:background .2s,transform .2s var(--spring); }
+    .drawer-close:hover { background:var(--bord); transform:scale(1.1) rotate(90deg); }
+    .drawer-p { font-size:clamp(15px,1.8vw,17px); color:var(--t2); line-height:1.85; margin-bottom:20px; }
+    @keyframes drawer-up { from{transform:translateY(100%)} to{transform:translateY(0)} }
+
+    /* ══ WAITLIST MODAL ══ */
+    .overlay { position:fixed; inset:0; z-index:500; background:rgba(26,26,46,.45); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); display:flex; align-items:center; justify-content:center; padding:16px; overflow-y:auto; animation:fi .3s var(--ease); }
+    .overlay.hide { display:none; }
+    .modal { background:var(--surf); border-radius:20px; padding:clamp(24px,5vw,40px); max-width:420px; width:100%; max-height:92vh; overflow-y:auto; box-shadow:0 24px 80px rgba(26,26,46,.22); position:relative; animation:su .45s var(--spring); }
+    .modal-step { animation:si .4s var(--ease); }
+    .m-close { position:absolute; top:14px; right:14px; background:none; border:none; font-size:18px; cursor:pointer; color:var(--t2); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; transition:background .2s,transform .2s var(--spring); }
+    .m-close:hover { background:var(--bg); transform:scale(1.1) rotate(90deg); }
+    .m-icon-d { width:40px; height:40px; border-radius:11px; background:var(--grad); margin:0 auto 14px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:16px; font-family:'Outfit',sans-serif; }
+    .m-icon-ok { width:44px; height:44px; border-radius:22px; background:var(--teal-s); margin:0 auto 14px; display:flex; align-items:center; justify-content:center; font-size:22px; color:var(--teal); }
+    .m-h3 { font-family:'Outfit',sans-serif; font-size:20px; font-weight:700; color:var(--text); margin:0; text-align:center; }
+    .m-sub { margin:6px 0 0; font-size:13px; color:var(--t2); text-align:center; }
+    .fg { margin-bottom:14px; }
+    .fl { font-size:13px; font-weight:600; color:var(--text); display:block; margin-bottom:5px; }
+    .fi { width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--bord); font-size:14px; outline:none; background:var(--bg); transition:border-color .2s,box-shadow .2s; box-sizing:border-box; font-family:'Inter',sans-serif; min-height:44px; }
+    .fi:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(78,168,166,.12); }
+    .fs { width:100%; padding:11px 14px; border-radius:10px; border:1px solid var(--bord); font-size:14px; outline:none; background:var(--bg); color:var(--t2); box-sizing:border-box; font-family:'Inter',sans-serif; cursor:pointer; min-height:44px; }
+    .fs:focus { border-color:var(--teal); box-shadow:0 0 0 3px rgba(78,168,166,.12); }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .chip { font-size:12px; padding:7px 12px; border-radius:9px; border:1px solid var(--bord); cursor:pointer; display:inline-flex; align-items:center; gap:5px; background:var(--bg); font-family:'Inter',sans-serif; transition:border-color .2s,background .2s,transform .15s var(--spring); }
+    .chip:hover { border-color:var(--teal); background:var(--teal-s); transform:scale(1.03); }
+    .chip input { accent-color:var(--teal); }
+    .m-legal { font-size:10px; color:var(--t2); line-height:1.5; margin:16px 0 12px; }
+    .m-disc { margin-bottom:16px; padding:14px 16px; background:var(--lav-s); border-radius:12px; }
+    .m-disc label { font-size:13px; color:var(--text); display:flex; align-items:flex-start; gap:8px; cursor:pointer; line-height:1.5; }
+    .m-disc input { accent-color:var(--lav); margin-top:3px; flex-shrink:0; }
+    .btn-full-grad { width:100%; padding:13px 0; border-radius:13px; background:var(--grad); color:#fff; font-size:15px; font-weight:600; border:none; cursor:pointer; font-family:'Inter',sans-serif; transition:transform .3s var(--spring),box-shadow .3s; position:relative; overflow:hidden; }
+    .btn-full-grad::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent); transform:translateX(-100%); transition:transform .5s; }
+    .btn-full-grad:hover::after { transform:translateX(100%); }
+    .btn-full-grad:hover { transform:scale(1.02); box-shadow:0 8px 24px rgba(126,111,174,.3); }
+    .btn-full-dark { width:100%; padding:13px 0; border-radius:13px; background:var(--text); color:#fff; font-size:15px; font-weight:600; border:none; cursor:pointer; font-family:'Inter',sans-serif; transition:transform .3s var(--spring),box-shadow .3s; }
+    .btn-full-dark:hover { transform:scale(1.02); box-shadow:0 8px 24px rgba(26,26,46,.18); }
+    .m-skip { text-align:center; margin-top:12px; font-size:13px; color:var(--t2); cursor:pointer; transition:color .2s; }
+    .m-skip:hover { color:var(--text); }
+    .fl-opt { font-weight:400; color:var(--t2); font-size:12px; }
+    .chip-none input:checked ~ * { color:var(--t2); }
+    .other-reveal { transition:opacity .2s; }
+    .toast-el { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--text); color:#fff; padding:12px 24px; border-radius:12px; font-size:14px; z-index:2000; pointer-events:none; white-space:nowrap; animation:ti .35s var(--spring),to .3s var(--ease) 2.7s forwards; }
+    .field-err { font-size:12px; color:#e05252; margin-top:5px; animation:fi .25s var(--ease); }
+
+    @keyframes fi { from{opacity:0} to{opacity:1} }
+    @keyframes su { from{opacity:0;transform:translateY(20px) scale(.94)} to{opacity:1;transform:none} }
+    @keyframes si { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:none} }
+    @keyframes ti { from{opacity:0;transform:translateX(-50%) translateY(16px) scale(.9)} to{opacity:1;transform:translateX(-50%) translateY(0) scale(1)} }
+    @keyframes to { from{opacity:1} to{opacity:0} }
+
+    @media (max-width:768px) { .split,.split-rev { flex-direction:column !important; } .shot { animation:phone-float 4s ease-in-out infinite; } }
+    @media (max-width:480px) { .nav { padding:8px 8px 8px 16px; } .btn-pill { padding:7px 14px; font-size:12px; } }
   </style>
 </head>
 <body>
-  <a class="skip-link" href="#main">Skip to main content</a>
+<a href="#main" class="skip">Skip to main content</a>
 
-  <!-- Nav -->
-  <nav aria-label="Main navigation">
-    <div class="nav-inner">
-      <a class="nav-logo" href="index.html" aria-label="Demetra home">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-          <rect width="28" height="28" rx="8" fill="#0891B2"/>
-          <path d="M14 6c-2 0-5 1.5-5 5 0 2.5 2 4.5 5 6 3-1.5 5-3.5 5-6 0-3.5-3-5-5-5z" fill="#fff" opacity="0.9"/>
-          <path d="M14 22s-7-4-7-10V8l7-3 7 3v4c0 6-7 10-7 10z" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        Demetra
-      </a>
-      <a class="nav-cta" href="vitals.html" aria-label="Open vitals graph">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-        </svg>
-        Vitals Graph
-      </a>
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <a href="index.html" class="nav-logo" aria-label="Demetra home">
+    <span class="d-icon" aria-hidden="true">D</span>demetra
+  </a>
+  <button class="btn btn-grad btn-pill" id="nav-cta" aria-haspopup="dialog">Join the Waitlist</button>
+</nav>
+
+<main id="main">
+
+  <!-- ══ HERO ══ -->
+  <section id="hero" class="hero" aria-labelledby="hero-h1">
+    <div class="blob blob-1" aria-hidden="true"></div>
+    <div class="blob blob-2" aria-hidden="true"></div>
+    <div class="blob blob-3" aria-hidden="true"></div>
+    <!-- floating particles -->
+    <div class="particles" aria-hidden="true">
+      <div class="dot" style="width:6px;height:6px;background:rgba(126,111,174,.5);top:20%;left:15%;--dur:9s;--dly:0s;--tx:30px;--ty:-70px;"></div>
+      <div class="dot" style="width:4px;height:4px;background:rgba(78,168,166,.5);top:35%;left:80%;--dur:11s;--dly:1.5s;--tx:-20px;--ty:-50px;"></div>
+      <div class="dot" style="width:8px;height:8px;background:rgba(126,111,174,.3);top:60%;left:25%;--dur:13s;--dly:3s;--tx:40px;--ty:-80px;"></div>
+      <div class="dot" style="width:5px;height:5px;background:rgba(78,168,166,.4);top:70%;left:70%;--dur:10s;--dly:0.8s;--tx:-30px;--ty:-60px;"></div>
+      <div class="dot" style="width:7px;height:7px;background:rgba(126,111,174,.35);top:15%;left:60%;--dur:14s;--dly:2s;--tx:15px;--ty:-90px;"></div>
+      <div class="dot" style="width:4px;height:4px;background:rgba(78,168,166,.55);top:80%;left:45%;--dur:8s;--dly:4s;--tx:-25px;--ty:-55px;"></div>
     </div>
-  </nav>
-
-  <main id="main">
-
-    <!-- Hero -->
-    <section class="hero" aria-labelledby="hero-heading">
-      <div class="hero-content">
-        <div class="hero-badge" aria-label="Family health monitoring">
-          <span class="hero-badge-dot" aria-hidden="true"></span>
-          Family Health Monitoring
-        </div>
-        <h1 id="hero-heading">Keep your family<br><em>healthy, together</em></h1>
-        <p class="hero-desc">
-          Demetra helps families stay on top of what matters most — tracking health trends, spotting changes early, and staying connected to the wellbeing of the people you love.
-        </p>
-        <div class="hero-actions">
-          <a class="btn-primary" href="vitals.html">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-            View Vitals Graph
-          </a>
-          <a class="btn-ghost" href="#features">
-            Learn more
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="5" y1="12" x2="19" y2="12"/>
-              <polyline points="12 5 19 12 12 19"/>
-            </svg>
-          </a>
-        </div>
+    <div class="hero-inner">
+      <div class="hero-badge" aria-hidden="true">
+        <span class="badge-dot"></span>Now accepting early access
       </div>
-
-      <!-- Mini monitor preview -->
-      <div class="hero-visual" aria-hidden="true">
-        <div class="monitor-card" role="presentation">
-          <div class="monitor-header">
-            <span class="monitor-title">VITALS MONITOR</span>
-            <div class="monitor-dots">
-              <span class="monitor-dot"></span>
-              <span class="monitor-dot"></span>
-              <span class="monitor-dot"></span>
-            </div>
-          </div>
-          <div class="vital-rows">
-            <div class="vital-row">
-              <span class="vital-label">BREATHING</span>
-              <div class="vital-bar-track"><div class="vital-bar-fill"></div></div>
-              <span class="vital-value">16 bpm</span>
-            </div>
-            <div class="vital-row">
-              <span class="vital-label">HEART</span>
-              <div class="vital-bar-track"><div class="vital-bar-fill"></div></div>
-              <span class="vital-value">72 bpm</span>
-            </div>
-            <div class="vital-row">
-              <span class="vital-label">SpO2</span>
-              <div class="vital-bar-track"><div class="vital-bar-fill"></div></div>
-              <span class="vital-value">98%</span>
-            </div>
-            <div class="vital-row">
-              <span class="vital-label">WEIGHT</span>
-              <div class="vital-bar-track"><div class="vital-bar-fill"></div></div>
-              <span class="vital-value">74 kg</span>
-            </div>
-          </div>
-          <div class="monitor-footer">
-            <div class="live-indicator">
-              <span class="live-dot"></span>
-              SYSTEM ONLINE
-            </div>
-          </div>
-        </div>
+      <h1 id="hero-h1" class="hero-h1">Like having a doctor<br><span class="grad-text">in the family</span></h1>
+      <p class="hero-sub">Demetra unifies your health data and uses AI to guide proactive care for you and your family. Starting with just your age, sex, and basic history. For free.</p>
+      <div class="hero-btn-wrap" style="margin-top:28px;">
+        <button class="btn btn-grad btn-lg" id="hero-cta" aria-haspopup="dialog">Join the Waitlist</button>
       </div>
-    </section>
-
-    <!-- Stats -->
-    <section class="stats-section" aria-label="Platform statistics">
-      <div class="stats-inner">
-        <div class="stat-item">
-          <div class="stat-number">Whole</div>
-          <div class="stat-label">Family coverage —<br>one place for everyone</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">Early</div>
-          <div class="stat-label">Trend detection before<br>symptoms become problems</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">Zero</div>
-          <div class="stat-label">Data shared with<br>third parties, ever</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-number">Always</div>
-          <div class="stat-label">Available — no app,<br>no account required</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features -->
-    <section id="features" class="features-section" aria-labelledby="features-heading">
-      <div class="section-label">What Demetra does</div>
-      <h2 id="features-heading">Everything your family needs to stay on top of their health</h2>
-      <p class="section-desc">
-        From tracking daily vitals to spotting patterns over weeks and months, Demetra brings your family's health picture into one clear, private view.
-      </p>
-      <div class="features-grid">
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-          <h3 class="feature-title">Whole-Family Profiles</h3>
-          <p class="feature-desc">Track health data for every member of your household — from kids to grandparents — all in one place, without juggling separate apps.</p>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-          </div>
-          <h3 class="feature-title">Vitals Graph</h3>
-          <p class="feature-desc">Visualize breathing rate, heart rate, blood oxygen, and weight over time in a single interactive chart. Spot trends and correlations at a glance.</p>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
-              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-              <line x1="6" y1="1" x2="6" y2="4"/>
-              <line x1="10" y1="1" x2="10" y2="4"/>
-              <line x1="14" y1="1" x2="14" y2="4"/>
-            </svg>
-          </div>
-          <h3 class="feature-title">Medication & Routine Tracking</h3>
-          <p class="feature-desc">Log medications, supplements, and daily health routines for each family member. Never miss a dose or forget who took what.</p>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M22 17H2a3 3 0 0 0 3-3V9a7 7 0 0 1 14 0v5a3 3 0 0 0 3 3zm-8.27 4a2 2 0 0 1-3.46 0"/>
-            </svg>
-          </div>
-          <h3 class="feature-title">Health Alerts</h3>
-          <p class="feature-desc">Get notified when a reading falls outside a normal range for that family member. Catch early warning signs before they escalate.</p>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
-          </div>
-          <h3 class="feature-title">Appointment History</h3>
-          <p class="feature-desc">Keep a record of doctor visits, test results, and diagnoses for the whole family. Share a clear health timeline with any provider, instantly.</p>
-        </article>
-
-        <article class="feature-card">
-          <div class="feature-icon" aria-hidden="true">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <h3 class="feature-title">Private by Design</h3>
-          <p class="feature-desc">Your family's health data never leaves your device. No cloud uploads, no accounts, no third-party access — ever.</p>
-        </article>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section class="cta-section" aria-labelledby="cta-heading">
-      <div class="cta-inner">
-        <h2 id="cta-heading">See your family's vitals right now</h2>
-        <p>Jump into the vitals graph — one of Demetra's core features — and start exploring health trends across breathing, heart rate, blood oxygen, and weight.</p>
-        <a class="btn-launch" href="vitals.html">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-          Open Vitals Graph
-        </a>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- Footer -->
-  <footer>
-    <div class="footer-inner">
-      <span class="footer-logo">Demetra</span>
-      <span class="footer-note">Family health monitoring — private, simple, always available.</span>
     </div>
-  </footer>
+    <div class="scroll-ind" aria-hidden="true">⌄</div>
+  </section>
+
+  <!-- ══ WHY DEMETRA ══ -->
+  <section id="story" class="sec sec-white" aria-labelledby="story-h2">
+    <div class="wrap wrap-narrow" style="text-align:center;">
+      <h2 id="story-h2" class="h2 h2-italic r">Why Demetra?</h2>
+      <div class="story-card r" style="--d:.1s" id="story-card" role="button" tabindex="0" aria-haspopup="dialog" aria-label="Read the full story behind Demetra">
+        <div class="story-q" aria-hidden="true">"</div>
+        <p class="story-text">Growing up in a family of doctors in Cyprus, I watched my mother do something that no app, no hospital, and no health system does well. She paid attention. She caught things early because she cared continuously, not just when someone walked into a clinic.</p>
+        <div class="story-attr">
+          <span class="story-by"><span class="story-avatar" aria-hidden="true">F</span>Founder, Demetra</span>
+          <span class="story-link">Read the full story <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ THE PROBLEM ══ -->
+  <section id="problem" class="sec sec-bg" aria-labelledby="prob-h2">
+    <div class="wrap">
+      <h2 id="prob-h2" class="h2 r">Millions are silently living<br>with treatable disease</h2>
+      <div class="stats">
+        <div class="stat r-scale" style="--d:.05s"><div class="stat-n">1 in 4</div><div class="stat-d">adults have undetected high blood pressure</div></div>
+        <div class="stat r-scale" style="--d:.15s"><div class="stat-n" data-countup="80" data-suffix="%">80%</div><div class="stat-d">of people with pre-diabetes are completely unaware</div></div>
+        <div class="stat r-scale" style="--d:.25s"><div class="stat-n">2 in 3</div><div class="stat-d">who should be on cholesterol medication have never been offered it</div></div>
+      </div>
+      <p class="r body-md" style="--d:.35s;margin-top:28px;text-align:center;max-width:460px;">Reactive healthcare is failing us.<br>We ought to do better for you and your loved ones.</p>
+    </div>
+  </section>
+
+  <div class="banner banner-lav"><div class="r"><p class="banner-title">The proactive health platform for families</p></div></div>
+
+  <!-- FEATURE 1 -->
+  <section id="health-score" class="sec sec-white" aria-labelledby="hs-h2">
+    <div class="split">
+      <div class="split-text r-left">
+        <p class="grad-label">Your Health Score</p>
+        <h2 id="hs-h2">One number that tells you where you stand</h2>
+        <p>A single, dynamic score reflecting your real-time health status. Tracking vitals, labs, and care compliance in one number. Know instantly if something needs your attention.</p>
+      </div>
+      <div class="split-img r-right"><div class="shot" role="img" aria-label="Demetra health score dashboard showing an overall score of 73 with organ system breakdown"><span class="shot-lbl">📱 Health Score — 73, gauge, breakdown</span></div></div>
+    </div>
+  </section>
+
+  <!-- FEATURE 2 -->
+  <section id="data" class="sec sec-bg" aria-labelledby="data-h2">
+    <div class="split split-rev">
+      <div class="split-text r-right">
+        <p class="grad-label">Connected Data</p>
+        <h2 id="data-h2">All your health data under one roof</h2>
+        <p>Upload lab results, screenshots, and PDFs. Connect Apple Health, wearables, and smart scales. Answer a few questions and Demetra fills in the rest.</p>
+      </div>
+      <div class="split-img r-left"><div class="shot" role="img" aria-label="Demetra app showing multiple ways to add health data"><span class="shot-lbl">📱 Data — chat upload, Apple Health, wearables, PDFs</span></div></div>
+    </div>
+  </section>
+
+  <!-- FEATURE 3 -->
+  <section id="care-plans" class="sec sec-white" aria-labelledby="cp-h2">
+    <div class="split">
+      <div class="split-text r-left">
+        <p class="grad-label">Proactive Care Plans</p>
+        <h2 id="cp-h2">Never miss what matters</h2>
+        <p>Demetra builds a personalized health timeline. Blood tests, vaccines, screenings, checkups. Month by month, always up to date. Know exactly what to do, when, and why.</p>
+      </div>
+      <div class="split-img r-right"><div class="shot" role="img" aria-label="Demetra care plan showing a month-by-month health timeline"><span class="shot-lbl">📱 Care plan — month-by-month timeline</span></div></div>
+    </div>
+  </section>
+
+  <!-- FEATURE 4 -->
+  <section id="family" class="sec sec-bg" aria-labelledby="fam-h2">
+    <div class="split split-rev">
+      <div class="split-text r-right">
+        <p class="grad-label">Family Health</p>
+        <h2 id="fam-h2">Keep an eye on the people you love</h2>
+        <p>Add your parents, spouse, or children. Monitor their health scores, compliance, and alerts. Get notified when someone needs attention. Your family's health, in one place.</p>
+      </div>
+      <div class="split-img r-left"><div class="shot" role="img" aria-label="Demetra family dashboard showing health scores for multiple members"><span class="shot-lbl">📱 Family dashboard — scores and status</span></div></div>
+    </div>
+  </section>
+
+  <!-- FEATURE 5 -->
+  <section id="vigilant" class="sec sec-white" aria-labelledby="vig-h2">
+    <div class="split">
+      <div class="split-text r-left">
+        <p class="grad-label">Always Vigilant</p>
+        <h2 id="vig-h2">Always looking out for you</h2>
+        <p>Demetra never stops working. It continuously monitors your data for concerning trends, undetected risks, and missed opportunities for care — and tells you when you need to know.</p>
+      </div>
+      <div class="split-img r-right"><div class="shot" role="img" aria-label="Demetra continuous monitoring showing early risk detection alerts"><span class="shot-lbl">📱 Alerts — trend detection, risk notification</span></div></div>
+    </div>
+  </section>
+
+  <div class="banner banner-teal"><div class="r"><p class="banner-title">Catch what busy healthcare systems often miss</p></div></div>
+
+  <!-- CLINICAL INTELLIGENCE -->
+  <section id="intelligence" class="sec sec-white" aria-labelledby="intel-h2">
+    <div class="wrap">
+      <div style="text-align:center;max-width:660px;margin:0 auto;">
+        <h2 id="intel-h2" class="h2 h2-sm r">Demetra runs an expanding list of checks so that you don't have to</h2>
+        <p class="r body-md" style="--d:.1s;text-align:center;margin-bottom:28px;">Translating clinical guidelines into plain language you can act on.</p>
+      </div>
+      <div class="agent-grid">
+        <div class="agent r" style="--d:.04s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 7.65l.77.77L12 20.65l7.65-7.65.77-.77a5.4 5.4 0 0 0 0-7.65z"/></svg></div><span class="agent-lbl">Are you at high risk for heart attack or stroke?</span></div>
+        <div class="agent r" style="--d:.08s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m10.5 1.5 3 3M8 8l8 8M3.5 14.5a5 5 0 0 0 7.07 0l3.93-3.93a5 5 0 0 0-7.07-7.07L3.5 7.43a5 5 0 0 0 0 7.07z"/></svg></div><span class="agent-lbl">Should you be on cholesterol medication?</span></div>
+        <div class="agent r" style="--d:.12s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div><span class="agent-lbl">Are you up to date on cancer screenings?</span></div>
+        <div class="agent r" style="--d:.16s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span class="agent-lbl">Could your medications be interacting?</span></div>
+        <div class="agent r" style="--d:.2s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg></div><span class="agent-lbl">What vaccines should you get this year?</span></div>
+        <div class="agent r" style="--d:.24s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><span class="agent-lbl">How do you compare to others like you?</span></div>
+        <div class="agent soon r" style="--d:.28s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v8"/><path d="M6 12c-2 0-4 1-4 4s2 4 4 4c1 0 2-.5 3-1"/><path d="M18 12c2 0 4 1 4 4s-2 4-4 4c-1 0-2-.5-3-1"/></svg></div><span class="agent-lbl">Should you be screened for lung disease? <span class="soon-tag">— coming soon</span></span></div>
+        <div class="agent soon r" style="--d:.32s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg></div><span class="agent-lbl">Could you have undetected diabetes? <span class="soon-tag">— coming soon</span></span></div>
+        <div class="agent soon r" style="--d:.36s"><div class="agent-ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t2)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2l4 4M17.4 7.6L7.8 17.2a2.83 2.83 0 0 1-4-4L13.4 3.6"/><path d="M2 22l4-4"/></svg></div><span class="agent-lbl">Are your vaccines up to date? <span class="soon-tag">— coming soon</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHARE WITH DOCTOR -->
+  <section id="doctor" class="sec sec-bg" aria-labelledby="doc-h2">
+    <div class="split split-rev">
+      <div class="split-text r-right">
+        <p class="grad-label">Doctor Sharing</p>
+        <h2 id="doc-h2">Walk into your next visit prepared.<br><span style="color:var(--teal)">Your doctor will thank you.</span></h2>
+        <p>Generate a QR code with a summary of your clinically relevant data. Your doctor scans it and instantly sees what matters: risk scores, trends, alerts, and device data.</p>
+        <p style="margin-top:12px;">Better data means better visits. Demetra reinforces your relationship with your clinicians — it doesn't replace it.</p>
+      </div>
+      <div class="split-img r-left"><div class="shot" role="img" aria-label="Demetra QR code sharing feature with clinician dashboard"><span class="shot-lbl">📱 QR code — clinician dashboard</span></div></div>
+    </div>
+  </section>
+
+  <div class="banner banner-lav"><div class="r"><p class="banner-title">The OS for your health outside the hospital</p><p class="banner-sub">Where your health journey ends.</p></div></div>
+
+  <!-- VISION -->
+  <section id="vision" class="sec sec-white" aria-labelledby="vis-h2">
+    <div class="wrap">
+      <h2 id="vis-h2" class="h2 r">Our Vision</h2>
+      <p class="r body-lg" style="--d:.1s;max-width:620px;text-align:center;margin:0 auto 36px;">We believe proactive care should be the foundation of healthcare. The knowledge to prevent most chronic disease already exists — Demetra puts it to work for you, continuously and personally.</p>
+      <div class="vision-strip r" style="--d:.2s" role="list">
+        <div class="vision-pill" role="listitem"><h3>Proactive, not reactive</h3><p>Runs clinical protocols in the background and surfaces what matters before it becomes a problem.</p></div>
+        <div class="vision-pill" role="listitem"><h3>Personalized, not generic</h3><p>Every recommendation is grounded in your actual data — not population averages or generic wellness advice.</p></div>
+        <div class="vision-pill" role="listitem"><h3>Accessible, not exclusive</h3><p>Genuine clinical value starting from basic information everyone already has, for free.</p></div>
+        <div class="vision-pill" role="listitem"><h3>For the whole family</h3><p>Your father's heart attack changes your risk profile. Demetra connects these dots across your household.</p></div>
+        <div class="vision-pill" role="listitem"><h3>Built to scale</h3><p>Deterministic, auditable protocols — not generic AI improvising answers. The same rigor, every time.</p></div>
+      </div>
+      <p class="r body-md" style="--d:.3s;margin-top:28px;text-align:center;max-width:520px;font-style:italic;">We are not building another chatbot. We are building the health system we wish existed.</p>
+    </div>
+  </section>
+
+  <!-- CORE VALUES -->
+  <section id="values" class="sec sec-bg" aria-labelledby="val-h2">
+    <div class="wrap wrap-narrow">
+      <h2 id="val-h2" class="h2 r">Core Values</h2>
+      <div class="vals r" style="--d:.1s">
+        <div class="val-item"><button class="val-trigger" aria-expanded="false" aria-controls="v0"><span class="val-title">Honesty and integrity over reassurance</span><svg class="val-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="val-body" id="v0" role="region"><div class="val-body-inner">Demetra tells you what you need to hear, not what you want to hear. If your numbers are concerning, we say so clearly. No alarmism to drive engagement. No sugarcoating. Trust is built on truth.</div></div></div>
+        <div class="val-item"><button class="val-trigger" aria-expanded="false" aria-controls="v1"><span class="val-title">Evidence, not opinion</span><svg class="val-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="val-body" id="v1" role="region"><div class="val-body-inner">Every recommendation traces back to published clinical guidelines: USPSTF, AHA, ACC, ADA. We do not invent health advice. We translate what the best physicians already know. When the evidence is uncertain, we say that too.</div></div></div>
+        <div class="val-item"><button class="val-trigger" aria-expanded="false" aria-controls="v2"><span class="val-title">Family over individual</span><svg class="val-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="val-body" id="v2" role="region"><div class="val-body-inner">Your father's diagnosis changes what you should be screening for. Your child's vaccine schedule matters to the whole household. We build for the family unit because that is how health actually works.</div></div></div>
+        <div class="val-item"><button class="val-trigger" aria-expanded="false" aria-controls="v3"><span class="val-title">Build with rigor, ship with courage</span><svg class="val-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="val-body" id="v3" role="region"><div class="val-body-inner">We use highly-evidenced clinical logic that is auditable and versioned. We do not let language models improvise with your health. But we also do not hide behind perfectionism: we ship, we learn, we improve. Every week.</div></div></div>
+        <div class="val-item"><button class="val-trigger" aria-expanded="false" aria-controls="v4"><span class="val-title">Your data is yours</span><svg class="val-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="val-body" id="v4" role="region"><div class="val-body-inner">We do not sell it. We do not monetize it. We do not share it without your explicit permission. Your health information exists to serve you and the people you choose to share it with. Full stop.</div></div></div>
+        <div class="val-item"><button class="val-trigger" aria-expanded="false" aria-controls="v5"><span class="val-title">Accessible by design</span><svg class="val-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="val-body" id="v5" role="region"><div class="val-body-inner">The free tier is not a teaser. It delivers the full standard of care for prevention. We believe everyone deserves to know their risks and what to do about them, regardless of income.</div></div></div>
+        <div class="val-item"><button class="val-trigger" aria-expanded="false" aria-controls="v6"><span class="val-title">Clinicians are partners, not competitors</span><svg class="val-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button><div class="val-body" id="v6" role="region"><div class="val-body-inner">We exist to make your relationship with your doctor better, not to replace it. Better data going in means better conversations, better decisions, and better outcomes. We strengthen the care team, we do not bypass it.</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CREDIBILITY -->
+  <section id="credibility" class="sec sec-white" aria-labelledby="cred-h2">
+    <div class="wrap wrap-narrow" style="text-align:center;">
+      <h2 id="cred-h2" class="h2 r">Built by physicians, researchers,<br>and operators</h2>
+      <p class="r body-md" style="--d:.1s;text-align:center;max-width:540px;margin:0 auto;">10+ years building clinical AI at the world's leading institutions. Published in Nature journals and JAMA. Backed by Y Combinator alumni.</p>
+      <div class="logo-strip r" style="--d:.2s" role="list" aria-label="Institutional affiliations">
+        <span class="logo-item" role="listitem">Stanford</span>
+        <span class="logo-item" role="listitem">Google</span>
+        <span class="logo-item" role="listitem">Y Combinator</span>
+        <span class="logo-item" role="listitem">MIT</span>
+        <span class="logo-item" role="listitem">BCG</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="cta" class="cta-band" aria-labelledby="cta-h2">
+    <div class="r" style="max-width:700px;margin:0 auto;position:relative;z-index:1;">
+      <h2 id="cta-h2">Your family's health,<br>handled.</h2>
+      <p>Join the waitlist. We will let you know when Demetra is ready.</p>
+      <div style="margin-top:28px;"><button class="btn btn-white btn-lg" id="cta-btn" aria-haspopup="dialog">Join the Waitlist</button></div>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <div>
+      <a href="index.html" class="foot-brand" aria-label="Demetra"><span style="width:22px;height:22px;border-radius:6px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:700;font-family:'Outfit',sans-serif;flex-shrink:0;" aria-hidden="true">D</span><span class="foot-name">demetra</span></a>
+      <p class="foot-tag">The proactive health platform for families.</p>
+    </div>
+    <div class="socials" aria-label="Social media">
+      <a href="https://x.com/demetrahealth" class="soc" aria-label="Demetra on X" target="_blank" rel="noopener noreferrer">𝕏</a>
+      <a href="https://instagram.com/demetrahealth" class="soc" aria-label="Demetra on Instagram" target="_blank" rel="noopener noreferrer"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+      <a href="https://facebook.com/demetrahealth" class="soc" aria-label="Demetra on Facebook" target="_blank" rel="noopener noreferrer">f</a>
+      <a href="https://linkedin.com/company/demetrahealth" class="soc" aria-label="Demetra on LinkedIn" target="_blank" rel="noopener noreferrer">in</a>
+    </div>
+    <div class="foot-links"><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+  </div>
+  <div class="foot-bottom">
+    <p class="foot-copy">© 2026 Demetra Health, Inc. All rights reserved.</p>
+    <p class="foot-disc">Demetra is not a substitute for professional medical advice, diagnosis, or treatment. Always consult your physician.</p>
+  </div>
+</footer>
+
+<!-- STORY DRAWER -->
+<div class="drawer-overlay hide" id="story-drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-h">
+  <div class="drawer" style="position:relative;">
+    <div class="drawer-handle" aria-hidden="true"></div>
+    <button class="drawer-close" id="drawer-close" aria-label="Close story">✕</button>
+    <div class="drawer-body">
+      <h2 id="drawer-h" class="drawer-h">Why Demetra?</h2>
+      <p class="drawer-p">Growing up in a family of doctors in Cyprus, I watched my mother do something that no app, no hospital, and no health system does well. She paid attention. She remembered that my uncle's cholesterol was high last year and followed up. She noticed when my grandfather's blood pressure crept up before he did. She caught things early because she cared continuously, not just when someone walked into a clinic.</p>
+      <p class="drawer-p">That's not a medical superpower. It's just what happens when someone who understands medicine also loves you.</p>
+      <p class="drawer-p">The problem is that most people don't have a doctor in the family. And the healthcare system was never designed to fill that gap. It waits for you to get sick, treats you when you do, and sends you home to figure out the rest on your own. Millions of people are walking around with high blood pressure, pre-diabetes, or missed medication needs and nobody is telling them.</p>
+      <p class="drawer-p">I left a career building clinical AI at Stanford and Google because I realized the bottleneck in preventive care isn't data and it isn't technology. It's that nobody is applying clinical reasoning to the data that already exists, proactively, for the people who need it most. Your age, your family history, your last blood test: that's often enough to know what you should be doing. But nobody is connecting those dots for you.</p>
+      <p class="drawer-p">Demetra is a doctor, a mother, and the person her whole family calls when something feels off. Not everyone has a Demetra. <strong style="color:var(--text)">Now you do.</strong> We built this platform so every family has someone watching over their health with the same knowledge, persistence, and love.</p>
+    </div>
+  </div>
+</div>
+
+<!-- WAITLIST MODAL -->
+<div class="overlay hide" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-h3">
+  <div class="modal" id="modal-card">
+    <button class="m-close" id="m-close" aria-label="Close">✕</button>
+    <div class="modal-step" id="s1">
+      <div style="text-align:center;margin-bottom:20px;"><div class="m-icon-d" aria-hidden="true">D</div><h3 id="modal-h3" class="m-h3">Join the waitlist</h3><p class="m-sub">Be the first to hear when Demetra is live.</p></div>
+      <div class="fg"><label class="fl" for="fn">First Name *</label><input class="fi" type="text" id="fn" name="first_name" placeholder="First Name" required autocomplete="given-name"></div>
+      <div class="fg"><label class="fl" for="ln">Last Name *</label><input class="fi" type="text" id="ln" name="last_name" placeholder="Last Name" required autocomplete="family-name"></div>
+      <div class="fg"><label class="fl" for="em">Email *</label><input class="fi" type="email" id="em" name="email" placeholder="Email" required autocomplete="email"></div>
+      <div class="fg"><label class="fl" for="ph">Phone (optional)</label><input class="fi" type="tel" id="ph" name="phone" placeholder="+1  Phone number" autocomplete="tel"></div>
+      <input type="text" name="website" autocomplete="off" tabindex="-1" aria-hidden="true" style="display:none">
+      <p class="m-legal">By clicking 'Sign up now', you consent to receive marketing communications from Demetra via email. Consent is not a condition of purchase. You can unsubscribe at any time.</p>
+      <button class="btn-full-dark" id="s1-btn">Sign up now</button>
+    </div>
+    <div class="modal-step" id="s2" style="display:none">
+      <div style="text-align:center;margin-bottom:24px;">
+        <div class="m-icon-ok" aria-hidden="true">✓</div>
+        <h3 class="m-h3">You're in!</h3>
+        <p class="m-sub" style="max-width:300px;margin:6px auto 0">A few quick questions to join our <strong style="color:var(--lav)">Inner Circle</strong> and get priority access.</p>
+      </div>
+
+      <!-- Q1: Age -->
+      <div class="fg">
+        <label class="fl">How old are you?</label>
+        <div class="chips" role="group" aria-label="Age range">
+          <label class="chip"><input type="radio" name="age_range" value="under_18"> Under 18</label>
+          <label class="chip"><input type="radio" name="age_range" value="18_25"> 18–25</label>
+          <label class="chip"><input type="radio" name="age_range" value="25_34"> 25–34</label>
+          <label class="chip"><input type="radio" name="age_range" value="35_44"> 35–44</label>
+          <label class="chip"><input type="radio" name="age_range" value="45_54"> 45–54</label>
+          <label class="chip"><input type="radio" name="age_range" value="55_64"> 55–64</label>
+          <label class="chip"><input type="radio" name="age_range" value="65_plus"> 65+</label>
+        </div>
+      </div>
+
+      <!-- Q2: Health focus -->
+      <div class="fg">
+        <label class="fl">What best describes your primary health focus right now? <span class="fl-opt">(Select all that apply)</span></label>
+        <div class="chips" role="group" aria-label="Health focus" id="q2-group">
+          <label class="chip"><input type="checkbox" name="health_focus" value="wellness"> Optimizing wellness &amp; longevity</label>
+          <label class="chip"><input type="checkbox" name="health_focus" value="chronic"> Managing a chronic condition</label>
+          <label class="chip"><input type="checkbox" name="health_focus" value="symptoms"> Understanding a new symptom</label>
+          <label class="chip"><input type="checkbox" name="health_focus" value="family_care"> Managing family / aging parents' care</label>
+          <label class="chip"><input type="checkbox" name="health_focus" value="records"> Organizing medical records</label>
+          <label class="chip" id="q2-other-label"><input type="checkbox" name="health_focus" value="other" id="q2-other-cb"> Other</label>
+          <label class="chip chip-none"><input type="checkbox" name="health_focus" value="none" id="q2-none"> None right now</label>
+        </div>
+        <input class="fi other-reveal" id="q2-other-text" name="health_focus_other" type="text" placeholder="Please describe…" style="display:none;margin-top:8px;font-size:13px;padding:8px 12px;">
+      </div>
+
+      <!-- Q3: Wearables -->
+      <div class="fg">
+        <label class="fl">Do you currently use any health wearables or apps? <span class="fl-opt">(Select all that apply)</span></label>
+        <div class="chips" role="group" aria-label="Wearables" id="q3-group">
+          <label class="chip"><input type="checkbox" name="wearables" value="apple_health"> Apple Watch / Apple Health</label>
+          <label class="chip"><input type="checkbox" name="wearables" value="fitbit"> Fitbit / Google Fit</label>
+          <label class="chip"><input type="checkbox" name="wearables" value="function_health"> Function Health or similar</label>
+          <label class="chip"><input type="checkbox" name="wearables" value="oura"> Oura Ring</label>
+          <label class="chip"><input type="checkbox" name="wearables" value="whoop"> Whoop</label>
+          <label class="chip"><input type="checkbox" name="wearables" value="cgm"> CGM</label>
+          <label class="chip" id="q3-other-label"><input type="checkbox" name="wearables" value="other" id="q3-other-cb"> Other</label>
+          <label class="chip chip-none"><input type="checkbox" name="wearables" value="none" id="q3-none"> None right now</label>
+        </div>
+        <input class="fi other-reveal" id="q3-other-text" name="wearables_other" type="text" placeholder="Please describe…" style="display:none;margin-top:8px;font-size:13px;padding:8px 12px;">
+      </div>
+
+      <!-- Q4: Features -->
+      <div class="fg">
+        <label class="fl">What Demetra feature are you most excited about? <span class="fl-opt">(Select all that apply)</span></label>
+        <div class="chips" role="group" aria-label="Features" id="q4-group">
+          <label class="chip"><input type="checkbox" name="features" value="health_scores"> Health Scores</label>
+          <label class="chip"><input type="checkbox" name="features" value="care_plans"> Care Plans</label>
+          <label class="chip"><input type="checkbox" name="features" value="family_health"> Family Health</label>
+          <label class="chip"><input type="checkbox" name="features" value="assistant"> AI Health Assistant</label>
+          <label class="chip"><input type="checkbox" name="features" value="doctor_sharing"> Doctor Sharing</label>
+          <label class="chip"><input type="checkbox" name="features" value="connected_data"> Connected Data</label>
+          <label class="chip"><input type="checkbox" name="features" value="vigilance"> Background checks &amp; vigilance</label>
+          <label class="chip chip-none" id="q4-none-label"><input type="checkbox" name="features" value="none" id="q4-none"> None of these</label>
+        </div>
+        <input class="fi other-reveal" id="q4-none-text" name="features_other" type="text" placeholder="What would you want instead?" style="display:none;margin-top:8px;font-size:13px;padding:8px 12px;">
+      </div>
+
+      <!-- Q5: How heard -->
+      <div class="fg">
+        <label class="fl">How did you hear about Demetra?</label>
+        <div class="chips" role="group" aria-label="Referral source" id="q5-group">
+          <label class="chip"><input type="radio" name="how_heard" value="friend_family"> Friend or family</label>
+          <label class="chip"><input type="radio" name="how_heard" value="social_media"> Social media</label>
+          <label class="chip"><input type="radio" name="how_heard" value="search"> Search</label>
+          <label class="chip"><input type="radio" name="how_heard" value="investor_press"> Investor or press</label>
+          <label class="chip" id="q5-other-label"><input type="radio" name="how_heard" value="other" id="q5-other-rb"> Other</label>
+        </div>
+        <input class="fi other-reveal" id="q5-other-text" name="how_heard_other" type="text" placeholder="Please describe…" style="display:none;margin-top:8px;font-size:13px;padding:8px 12px;">
+      </div>
+
+      <!-- Q6: Frustration -->
+      <div class="fg">
+        <label class="fl" for="frustration">What is your single biggest frustration with managing your health right now? <span class="fl-opt">(Optional)</span></label>
+        <textarea class="fi" id="frustration" name="frustration" rows="3" placeholder="Tell us what you hope we can solve for you…" style="resize:vertical;min-height:80px"></textarea>
+      </div>
+
+      <button class="btn-full-grad" id="s2-btn">Join the Inner Circle</button>
+      <p class="m-skip" id="m-skip" role="button" tabindex="0">No thanks, I am all set.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── SUPABASE CLIENT
+var sb = supabase.createClient(
+  'https://zzlkuzslpwozbfdazdqi.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bGt1enNscHdvemJmZGF6ZHFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjE1MzcsImV4cCI6MjA5MTkzNzUzN30.SZwV5qEh1fhUPMf0vu2wGSIA0cSaHJeTedNZZLSkGng'
+);
+
+// ── SCROLL REVEAL
+(function(){
+  var rm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(rm) return;
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ e.target.classList.toggle('on', e.isIntersecting); });
+  }, {threshold:0.1});
+  document.querySelectorAll('.r,.r-left,.r-right,.r-scale,.r-clip').forEach(function(el){ obs.observe(el); });
+})();
+
+// ── COUNT-UP
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var obs = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target, target = +el.dataset.countup, suffix = el.dataset.suffix||'';
+      var t0 = performance.now(), dur = 1600;
+      (function tick(now){
+        var p = Math.min((now-t0)/dur,1);
+        var ease = p<1 ? 1-Math.pow(1-p,3) : 1; // ease-out-cubic
+        el.textContent = Math.round(ease*target) + suffix;
+        if(p<1) requestAnimationFrame(tick);
+      })(t0);
+    });
+  }, {threshold:0.6});
+  document.querySelectorAll('[data-countup]').forEach(function(el){ obs.observe(el); });
+})();
+
+// ── 3D CARD TILT
+(function(){
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if('ontouchstart' in window) return; // skip on touch
+  var cards = document.querySelectorAll('.stat,.vision-pill,.story-card');
+  cards.forEach(function(card){
+    card.addEventListener('mousemove', function(e){
+      var r = card.getBoundingClientRect();
+      var x = (e.clientX - r.left) / r.width  - 0.5;
+      var y = (e.clientY - r.top)  / r.height - 0.5;
+      var max = card.classList.contains('story-card') ? 6 : 10;
+      card.style.transform = 'translateY(-7px) perspective(800px) rotateX('+(-y*max)+'deg) rotateY('+(x*max)+'deg) scale(1.02)';
+    });
+    card.addEventListener('mouseleave', function(){
+      card.style.transform = '';
+    });
+  });
+})();
+
+// ── ACCORDION
+document.querySelectorAll('.val-trigger').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var item = btn.closest('.val-item');
+    var body = item.querySelector('.val-body');
+    var isOpen = item.classList.contains('open');
+    document.querySelectorAll('.val-item.open').forEach(function(o){
+      o.classList.remove('open');
+      o.querySelector('.val-body').style.maxHeight='0';
+      o.querySelector('.val-trigger').setAttribute('aria-expanded','false');
+    });
+    if(!isOpen){ item.classList.add('open'); body.style.maxHeight=body.scrollHeight+'px'; btn.setAttribute('aria-expanded','true'); }
+  });
+});
+
+// ── STORY DRAWER
+(function(){
+  var drawer=document.getElementById('story-drawer'), lastF=null;
+  function open(t){ lastF=t||document.activeElement; drawer.classList.remove('hide'); document.body.style.overflow='hidden'; document.getElementById('drawer-close').focus(); }
+  function close(){ drawer.classList.add('hide'); document.body.style.overflow=''; if(lastF) lastF.focus(); }
+  var card=document.getElementById('story-card');
+  card.addEventListener('click',function(){ open(card); });
+  card.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(card); }});
+  document.getElementById('drawer-close').addEventListener('click',close);
+  drawer.addEventListener('click',function(e){ if(e.target===drawer) close(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!drawer.classList.contains('hide')) close(); });
+})();
+
+// ── WAITLIST MODAL
+(function(){
+  var ov=document.getElementById('modal'), s1=document.getElementById('s1'), s2=document.getElementById('s2'), lastF=null;
+  var _waitlistId = null;
+
+  function open(t){ lastF=t||document.activeElement; ov.classList.remove('hide'); document.body.style.overflow='hidden'; setTimeout(function(){ document.getElementById('fn').focus(); },80); }
+  function close(){ ov.classList.add('hide'); document.body.style.overflow=''; s2.style.display='none'; s1.style.display=''; _waitlistId=null; if(lastF) lastF.focus(); }
+  function toast(msg){ var t=document.createElement('div'); t.className='toast-el'; t.setAttribute('role','status'); t.setAttribute('aria-live','polite'); t.textContent=msg; document.body.appendChild(t); setTimeout(function(){ t.remove(); },3200); }
+  function showFieldError(fieldId, msg){
+    var field=document.getElementById(fieldId);
+    var existing=field.parentNode.querySelector('.field-err');
+    if(existing) existing.remove();
+    var err=document.createElement('p'); err.className='field-err'; err.setAttribute('role','alert'); err.textContent=msg;
+    field.parentNode.appendChild(err);
+    setTimeout(function(){ err.remove(); },4500);
+  }
+  function clearErrors(){ document.querySelectorAll('.field-err').forEach(function(el){ el.remove(); }); }
+
+  ['nav-cta','hero-cta','cta-btn'].forEach(function(id){ var el=document.getElementById(id); if(el) el.addEventListener('click',function(){ open(el); }); });
+  document.getElementById('m-close').addEventListener('click',close);
+  ov.addEventListener('click',function(e){ if(e.target===ov) close(); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&!ov.classList.contains('hide')) close(); });
+
+  // ── STEP 1: insert row
+  document.getElementById('s1-btn').addEventListener('click', async function(){
+    clearErrors();
+    var btn=this;
+    var firstName=document.getElementById('fn').value.trim();
+    var lastName =document.getElementById('ln').value.trim();
+    var email    =document.getElementById('em').value.trim();
+    var phone    =document.getElementById('ph').value.trim();
+
+    if(!firstName){ showFieldError('fn','First name is required'); return; }
+    if(!lastName) { showFieldError('ln','Last name is required');  return; }
+    if(!email)    { showFieldError('em','Email is required');       return; }
+
+    btn.disabled=true; btn.textContent='Saving…';
+
+    var result = await sb.from('waitlist').insert({
+      first_name: firstName,
+      last_name:  lastName,
+      email:      email,
+      phone:      phone || null,
+    }).select('id').single();
+
+    btn.disabled=false; btn.textContent='Sign up now';
+
+    if(result.error){
+      if(result.error.code==='23505'){
+        showFieldError('em','You\'re already on the list!');
+      } else {
+        toast('Something went wrong. Please try again.');
+        console.error(result.error);
+      }
+      return;
+    }
+
+    _waitlistId=result.data.id;
+    s1.style.display='none'; s2.style.display='';
+    document.getElementById('modal-card').scrollTop=0;
+  });
+
+  // ── STEP 2: update row with survey
+  document.getElementById('s2-btn').addEventListener('click', async function(){
+    var btn=this;
+    btn.disabled=true; btn.textContent='Saving…';
+
+    var ageRange   =(document.querySelector('input[name=age_range]:checked')||{}).value||null;
+    var hf         =Array.from(document.querySelectorAll('input[name=health_focus]:checked')).map(function(el){ return el.value; });
+    var hfOther    =document.getElementById('q2-other-text').value.trim()||null;
+    var wear       =Array.from(document.querySelectorAll('input[name=wearables]:checked')).map(function(el){ return el.value; });
+    var wearOther  =document.getElementById('q3-other-text').value.trim()||null;
+    var feats      =Array.from(document.querySelectorAll('input[name=features]:checked')).map(function(el){ return el.value; });
+    var featsOther =document.getElementById('q4-none-text').value.trim()||null;
+    var heard      =(document.querySelector('input[name=how_heard]:checked')||{}).value||null;
+    var heardOther =document.getElementById('q5-other-text').value.trim()||null;
+    var frustration=document.getElementById('frustration').value.trim()||null;
+
+    var result = await sb.from('waitlist').update({
+      inner_circle:       true,
+      age_range:          ageRange,
+      health_focus:       hf.length    ? hf    : null,
+      health_focus_other: hfOther,
+      wearables:          wear.length  ? wear  : null,
+      wearables_other:    wearOther,
+      features:           feats.length ? feats : null,
+      features_other:     featsOther,
+      how_heard:          heard,
+      how_heard_other:    heardOther,
+      frustration:        frustration,
+    }).eq('id', _waitlistId);
+
+    btn.disabled=false; btn.textContent='Join the Inner Circle';
+
+    if(result.error){
+      toast('Something went wrong. Please try again.');
+      console.error(result.error);
+      return;
+    }
+
+    close();
+    toast('Welcome to the Inner Circle. \u2728');
+  });
+
+  // ── SKIP
+  var skip=document.getElementById('m-skip');
+  function doSkip(){
+    if(_waitlistId) sb.from('waitlist').update({ inner_circle: false }).eq('id', _waitlistId);
+    close();
+    toast('You are on the list!');
+  }
+  skip.addEventListener('click',doSkip);
+  skip.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); doSkip(); }});
+
+  // ── FOCUS TRAP
+  ov.addEventListener('keydown',function(e){
+    if(e.key!=='Tab') return;
+    var all=ov.querySelectorAll('button,input,select,textarea,[tabindex="0"]');
+    var vis=Array.from(all).filter(function(el){ return !el.closest('[style*="display:none"]'); });
+    if(!vis.length) return;
+    if(e.shiftKey){ if(document.activeElement===vis[0]){ e.preventDefault(); vis[vis.length-1].focus(); }}
+    else{ if(document.activeElement===vis[vis.length-1]){ e.preventDefault(); vis[0].focus(); }}
+  });
+})();
+
+// ── INNER CIRCLE: "None" mutual exclusion
+(function(){
+  // Q2 health_focus
+  var q2none = document.getElementById('q2-none');
+  var q2others = Array.from(document.querySelectorAll('input[name=health_focus]')).filter(function(el){ return el !== q2none; });
+  if(q2none){
+    q2none.addEventListener('change', function(){ if(this.checked) q2others.forEach(function(el){ el.checked=false; el.dispatchEvent(new Event('change')); }); });
+    q2others.forEach(function(el){ el.addEventListener('change', function(){ if(this.checked) q2none.checked=false; }); });
+  }
+  // Q3 wearables
+  var q3none = document.getElementById('q3-none');
+  var q3others = Array.from(document.querySelectorAll('input[name=wearables]')).filter(function(el){ return el !== q3none; });
+  if(q3none){
+    q3none.addEventListener('change', function(){ if(this.checked) q3others.forEach(function(el){ el.checked=false; el.dispatchEvent(new Event('change')); }); });
+    q3others.forEach(function(el){ el.addEventListener('change', function(){ if(this.checked) q3none.checked=false; }); });
+  }
+  // Q4 features — "None of these" unchecks others and vice-versa
+  var q4none = document.getElementById('q4-none');
+  var q4others = Array.from(document.querySelectorAll('input[name=features]')).filter(function(el){ return el !== q4none; });
+  if(q4none){
+    q4none.addEventListener('change', function(){ if(this.checked) q4others.forEach(function(el){ el.checked=false; }); });
+    q4others.forEach(function(el){ el.addEventListener('change', function(){ if(this.checked) q4none.checked=false; }); });
+  }
+})();
+
+// ── INNER CIRCLE: "Other" text reveal
+(function(){
+  // checkbox Other reveal
+  [
+    { cb: 'q2-other-cb', text: 'q2-other-text' },
+    { cb: 'q3-other-cb', text: 'q3-other-text' },
+    { cb: 'q4-none',     text: 'q4-none-text'  },
+  ].forEach(function(cfg){
+    var cb = document.getElementById(cfg.cb);
+    var tx = document.getElementById(cfg.text);
+    if(!cb||!tx) return;
+    cb.addEventListener('change', function(){
+      tx.style.display = this.checked ? '' : 'none';
+      if(this.checked) tx.focus();
+    });
+  });
+  // Q5 radio Other reveal
+  document.querySelectorAll('input[name=how_heard]').forEach(function(el){
+    el.addEventListener('change', function(){
+      var tx = document.getElementById('q5-other-text');
+      if(!tx) return;
+      tx.style.display = this.value === 'other' ? '' : 'none';
+      if(this.value === 'other') tx.focus();
+    });
+  });
+})();
+</script>
 </body>
 </html>

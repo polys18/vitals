@@ -1142,7 +1142,7 @@ var sb = supabase.createClient(
     btn.disabled=false; btn.textContent='Sign up now';
     if(r.error){ if(r.error.code==='23505'){ showFieldError('em','You\'re already on the list!'); } else { toast('Something went wrong. Please try again.'); console.error(r.error); } return; }
     _waitlistId=r.data.id;
-    fetch('https://zzlkuzslpwozbfdazdqi.supabase.co/functions/v1/send-confirmation',{ method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bGt1enNscHdvemJmZGF6ZHFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU4NTA1NjgsImV4cCI6MjA2MTQyNjU2OH0.ghRZo1c1eH2fIUKqN-gNe5xBUQjxvkK1g7FfJRwkxHw'}, body:JSON.stringify({ email:em, firstName:fn, token:r.data.confirmation_token }) }).catch(console.error);
+    fetch('https://zzlkuzslpwozbfdazdqi.supabase.co/functions/v1/send-confirmation',{ method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6bGt1enNscHdvemJmZGF6ZHFpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNjE1MzcsImV4cCI6MjA5MTkzNzUzN30.SZwV5qEh1fhUPMf0vu2wGSIA0cSaHJeTedNZZLSkGng'}, body:JSON.stringify({ email:em, firstName:fn, token:r.data.confirmation_token }) }).catch(console.error);
     s1.style.display='none'; s2.style.display=''; document.getElementById('modal-card').scrollTop=0;
   });
   document.getElementById('s2-btn').addEventListener('click', async function(){
